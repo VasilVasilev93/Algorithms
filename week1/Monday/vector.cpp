@@ -93,6 +93,16 @@ struct Vector
 		return arrCapacity;
 	}
 
+	void print()
+	{
+		for(int i = 0; i < current_size; i++)
+		{
+			std::cout << arr[i];
+		}
+
+		std::cout << std::endl;
+	}
+
 };
 
 
@@ -107,6 +117,7 @@ int main()
 	test.insert(0, 1);
 	test.pop();
 	test.remove(1);
+	test.print();
 
 	return 0;
 }
