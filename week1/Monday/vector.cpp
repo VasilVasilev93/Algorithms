@@ -26,7 +26,7 @@ struct Vector
 			{
 				copyArr[i] = arr[i];
 			}
-			arrCapacity *= arrCapacity;
+			arrCapacity *= 2;
 			delete [] arr;
 			arr = copyArr;
 		}
@@ -52,7 +52,7 @@ struct Vector
 			{
 				copyArr[i] = arr[i];
 			}
-			arrCapacity *= arrCapacity;
+			arrCapacity *= 2;
 			delete [] arr;
 			arr = copyArr;
 		}
