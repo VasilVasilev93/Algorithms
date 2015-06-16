@@ -67,19 +67,15 @@ void merge_helper(int *arr, int left, int right, int *copyArr)
     }
 }
 
-int mergesort(int *arr, int size)
+void mergesort(int *arr, int size)
 {
     int *copyArr = new int[size];
     if(copyArr != NULL)
     {
         merge_helper(arr, 0, size, copyArr);
         delete [] copyArr;
-        return 1;
     }
-    else
-    {
-        return 0;
-    }
+
 }
 
 
@@ -91,8 +87,6 @@ int main()
 	mergesort(arr, 10);
 
 	print(arr, 10);
-
-	system("pause");
 
 	return 0;
 }
