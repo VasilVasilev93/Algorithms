@@ -1,50 +1,22 @@
 #include <iostream>
+#include <time.h>
 
 using namespace std;
 
 
-void extendArr(int* &arr, int currentSize, int &size)
+void extendArr(int* &arr, int &size)
 	{
 
 			int* copyArr = new int[2*size];
 			for(int i = 0; i < size; i++)
 			{
-				copyArr[i] = arr[i];			
+				copyArr[i] = arr[i];
 			}
 			size *= 2;
 			delete [] arr;
 
 			arr = copyArr;
 	}
-
-
-void keepRule(int* arr, int lastCopy, int first, int last)
-{
-	while(lastCopy/2 >= first)
-	{
-		if(arr[lastCopy/2] < arr[lastCopy])
-		{
-			swap(arr[lastCopy/2], arr[lastCopy]);
-		}
-		lastCopy --;
-	}
-
-	int firstCopy = first;
-	while(firstCopy < last || firstCopy*2 <= last)
-	{
-		if(firstCopy*2 + 1 <= last && (arr[firstCopy] < arr[firstCopy*2 + 1]))
-		{
-			swap(arr[firstCopy], arr[firstCopy*2 + 1]);
-		}
-		else if(firstCopy*2 <= last && (arr[firstCopy] < arr[firstCopy*2]))
-		{
-			swap(arr[firstCopy], arr[firstCopy*2]);
-		}
-
-		firstCopy++;
-	}
-}
-
 
 bool is_sorted(int* arr, int size)
 {
@@ -55,14 +27,62 @@ bool is_sorted(int* arr, int size)
 	return true;
 }
 
+void insertHelper(int* arr, int first, int last)
+{
+	int copyLast = last;
+	while(copyLast > first)
+		{
+			if(arr[copyLast] > arr[copyLast/2])
+			{
+				swap(arr[copyLast], arr[copyLast/2]);
+				copyLast /= 2;
+			}
+			else
+			{
+				break;
+			}
+		}
+}
+
+void removeMaxHelper(int* arr, int first, int last)
+{
+	int copyFirst = first;
+	while(copyFirst*2 <= last)
+		{
+			if(copyFirst*2 + 1 <= last)
+			{
+				if(arr[copyFirst] < arr[copyFirst*2] && arr[copyFirst*2] >= arr[copyFirst*2 + 1])
+				{
+					swap(arr[copyFirst], arr[copyFirst*2]);
+					copyFirst *= 2;
+					continue;
+				}
+				else if(arr[copyFirst] < arr[copyFirst*2 + 1])
+				{
+					swap(arr[copyFirst], arr[copyFirst*2 + 1]);
+					copyFirst = copyFirst*2 + 1;
+					continue;
+				}
+			}
+			else
+			{
+				if(arr[copyFirst] < arr[copyFirst*2])
+				{
+					swap(arr[copyFirst], arr[copyFirst*2]);
+					copyFirst *= 2;
+					continue;
+				}
+			}
+			break;
+		}
+}
+
 struct Heap
 {
 	int *arr;
 	int last;
 	int first;
 	int size;
-	int sortArrIndex;
-	int* sortedArr;
 
 	Heap()
 	{
@@ -70,8 +90,6 @@ struct Heap
 		arr = new int[size];
 		first = 1;
 		last = 1;
-		sortArrIndex = first;
-		sortedArr = new int[size];
 	}
 
 	void print(int* arr)
@@ -81,48 +99,37 @@ struct Heap
 
 	void insert(int value)
 	{
-		if(last == size) 
+		if(last == size)
 		{
-			extendArr(this->arr, last, size);
-			delete [] sortedArr;
-			sortedArr = new int[size];
+			extendArr(arr, size);
 		}
 
-		//int lastCopy = last;
 		arr[last++] = value;
-		if(last - 1 == 1) return;
-		keepRule(arr, last - 1, first, last);
+		if(last > 2)
+		{
+			insertHelper(arr, first, last-1);
+		}
 	}
 
 	void removeMax()
 	{
-		if(first > last)
-		{
-			last--;
-			delete [] arr;
-			arr = sortedArr;
-			return;
-		}
-		sortedArr[sortArrIndex++] = arr[first];
-		
-		for(int i = 1; i < last; i++)
-		{
-			arr[i] = arr[i+1];
-		}
+		swap(arr[first], arr[last-1]);
 		last--;
-
+		removeMaxHelper(arr, first, last-1);
 	}
-
-	void sort()
+	
+	void heapSort()
 	{
-		last--;
-		while(first <= last + 1)
+		int* sortedArr = new int[size];
+		int copyLast = last;
+		for(int i = 1; i < copyLast; i++)
 		{
+			sortedArr[i] = getMax();
 			removeMax();
-			keepRule(arr, last - 1, first, last);
 		}
-		last = sortArrIndex;
-		//delete [] sortedArr;
+		last = copyLast;
+		delete [] arr;
+		arr = sortedArr;
 	}
 
 	int getMax()
@@ -137,12 +144,17 @@ int main()
 	int size = 10;
 
 	Heap test = Heap();
-	for(int i = 0; i < 100000; i++)
+	for(int i = 0; i < 1000000; i++)
 	{
-		test.insert(rand() % 1000);
+		test.insert(rand() % 32768);
 	}
 
-	test.sort();
+	clock_t tStart = clock();
+
+	test.heapSort();
+
+	printf("Time taken: %.2fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
+	cout << endl;
 
 	cout << is_sorted(test.arr, test.last);
 
