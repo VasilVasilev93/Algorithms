@@ -68,9 +68,9 @@ public:
 	void pop()
 	{
 		assert(currentSize > 0);
-		if(v_capacity >= 2 * currentSize)
+		if(v_capacity >= 2 * currentSize) 
 		{
-			v_capacity /= 2;
+			v_capacity /= 2; // Shrinking the vector, in case it gets large enough to use much space
 		}
 		currentSize--;
 	}
