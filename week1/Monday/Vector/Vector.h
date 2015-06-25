@@ -59,7 +59,7 @@ public:
 		}
 
 		buffer[currentSize++] = item;
-	};
+	}
 
 
 	/**
